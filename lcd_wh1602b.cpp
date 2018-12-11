@@ -3,8 +3,8 @@
 
 WH1602B LCD;
 
-// Методы управления LCD дисплеем WH1602B
-// --------------------- Инициализация статического массива ------------------------
+// Methods to drive LCD WH1602B
+// --------------------- Initialize russian font ------------------------
 
 	uint8_t WH1602B::RUSSIAN[64] =
 	{ 
@@ -75,19 +75,18 @@ WH1602B LCD;
 		0xC7,	// я
 };
 
-// ----------------------------- Конструктор -----------------------------------
+// ----------------------------- Constructor -----------------------------------
 WH1602B::WH1602B()
 {
 	display_mode = 1;
 }
 
-// -------------------- Начальная настройа дисплея -----------------------------
+// ---------------------------- Initialization ---------------------------------
 void WH1602B::InitLCD(uint8_t mode)
 {
 	display_mode = mode;
 	
-	// Ножки PE0 - PE7 на вывоход
-	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;					// IO port E clock enabled
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;						// IO port E clock enabled
 	
 	if(mode)
 	{
@@ -158,8 +157,8 @@ void WH1602B::InitLCD(uint8_t mode)
 	GPIOE->PUPDR &= ~ GPIO_PUPDR_PUPD10_Msk;			// NO pull-up, pull-down
 	GPIOE->MODER |= GPIO_MODER_MODER10_0;					// Output mode
 
-	// Процедура инициализации описана в документации на LDC дисплей
-	Tim2DelayMs(30);															// Задержка после включения
+	// Process, to initialize LCD is discribed in documentation
+	Tim2DelayMs(30);															// Time Delay after power on
 	if(display_mode)
 	{
 		for(uint8_t n = 0; n < 3; n++)
@@ -167,23 +166,23 @@ void WH1602B::InitLCD(uint8_t mode)
 			Write(0x30, CMD);
 			Tim2DelayMs(5);
 		}
-		Write(0x3C, CMD);																// 0x3C = 00111100, 8 бит, 2 строки, шрифт 5х11
-		Write(0x01, CMD);																// 0x01 = 00000001, Очистить дисплей
-		Write(0x06, CMD);																// 0x06 = 00000110, Инкремент адреса, экран не движется
-		Write(0x0E, CMD);																// 0x01 = 00001111, Дисплей вкл, курсор вкл, миг.курсор вкл.
+		Write(0x3C, CMD);																// 0x3C = 00111100, 8 bit, 2 row, font 5х11
+		Write(0x01, CMD);																// 0x01 = 00000001, Clear display
+		Write(0x06, CMD);																// 0x06 = 00000110, Address increment, display isn't move
+		Write(0x0E, CMD);																// 0x0E = 00001110, Dispplay on, cursor on, cursor blinking off
 	}
 	else
 	{
 		Write(0x33, CMD);
 		Write(0x32, CMD);
-		Write(0x2C, CMD);																// 0x3C = 00111100, 8 бит, 2 строки, шрифт 5х11
-		Write(0x01, CMD);																// 0x01 = 00000001, Очистить дисплей
-		Write(0x06, CMD);																// 0x06 = 00000110, Инкремент адреса, экран не движется
-		Write(0x0E, CMD);																// 0x01 = 00001111, Дисплей вкл, курсор вкл, миг.курсор вкл.
+		Write(0x2C, CMD);																// 0x2C = 00111100, 8 bit, 2 row, font 5х11
+		Write(0x01, CMD);																// 0x01 = 00000001, Clear display
+		Write(0x06, CMD);																// 0x06 = 00000110, Address increment, display isn't move
+		Write(0x0E, CMD);																// 0x0E = 00001110, Dispplay on, cursor on, cursor blinking off
 	}
 }
 
-// ----------------------- Очистить дисплей ---------------------------------
+// ------------------------ Clear display ----------------------------------
 void WH1602B::ClearLCD()
 {
 	
@@ -191,11 +190,10 @@ void WH1602B::ClearLCD()
 	Tim2DelayMs(2);
 }
 
-// ------------------- Ожидание готовности LCD дисплея ------------------------
+// ----------------------- Wait till LCD is ready ---------------------------
 uint8_t WH1602B::WaitLCD()
 {
-	// Флаг занятости выставляется дисплеем на ножку DB7 (PE7)
-	// Настраиваем 
+	// DB7 (PE7) - busy flag
 	GPIOE->MODER &= ~GPIO_MODER_MODER7;					 	// Input mode
 	GPIOE->PUPDR |= GPIO_PUPDR_PUPDR7_0;					// Pull-up
 	
@@ -221,7 +219,7 @@ uint8_t WH1602B::WaitLCD()
 	return 0;
 }
 
-// ------------------- Положение курсора на дисплее -------------------------
+// ----------------------- Cursor position ------------------------------
 //				col 1 ..................................... col 16
 // row 0   00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
 // row 1	 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F
@@ -234,7 +232,7 @@ void WH1602B::SetPosition(uint8_t row, uint8_t column)
 	Tim14DelayUs(40);
 }
 
-// ------------------------ Вывод строки ------------------------------------
+// ------------------------ Print string ---------------------------------
 void WH1602B::WriteString(const uint8_t *str)
 {
 	uint8_t symbol;
@@ -250,7 +248,7 @@ void WH1602B::WriteString(const uint8_t *str)
 	}
 }
 
-// -------------------- Запись команды ---------------------------------
+// -------------------- Write command or data ----------------------------
 uint8_t WH1602B::Write(uint8_t data, uint8_t data_type)
 {
 	if(WaitLCD()) { return 1; }
@@ -290,7 +288,7 @@ uint8_t WH1602B::Write(uint8_t data, uint8_t data_type)
 	return 0;
 }
 
-// -------------------- Установить ножки порта -------------------------------
+// ---------------------- Set port state ---------------------------------
 void WH1602B::SetPort(uint8_t state)
 {
 	uint16_t old_state = GPIOE->ODR;
@@ -299,21 +297,21 @@ void WH1602B::SetPort(uint8_t state)
 	else { GPIOE->ODR = ((state << 4) | (old_state & 0xFF0F)); }
 }
 
-// ---------------- Установить/снять ножку RS (PIN PE8) -----------------------
+// ------------------ Set/reset pin RS (PIN PE8) --------------------------
 void WH1602B::RS_PIN(uint8_t state)
 {
 	if(state) { GPIOE->BSRR |= GPIO_BSRR_BS_8; }
 	else { GPIOE->BSRR |= GPIO_BSRR_BR_8;	}
 }
 
-// ----------------- Установить/снять ножку RW (PIN PE9) ----------------------
+// ------------------ Set/reset pin RW (PIN PE9) ---------------------------
 void WH1602B::RW_PIN(uint8_t state)
 {
 	if(state) { GPIOE->BSRR |= GPIO_BSRR_BS_9; }
 	else { GPIOE->BSRR |= GPIO_BSRR_BR_9;	}
 }
 
-// ----------------- Установить/снять ножку E (PIN PE10) ----------------------
+// ------------------ Set/reset pin E (PIN PE10) ---------------------------
 void WH1602B::E_PIN(uint8_t state)
 {
 	if(state) { GPIOE->BSRR |= GPIO_BSRR_BS_10; }

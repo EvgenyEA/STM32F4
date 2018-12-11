@@ -1,23 +1,9 @@
-// Класс управления жидкокристаллическим индикатором WH1602B-YGK-CTK
+// C++ class to drive WH1602B-YGK-CTK
 #include "header.h"
 
-// Общая процедура работы с дисплеем:
-// На пины RS, R/W, DB7 – DB0 – нужные сигналы, соответствующие нашей команде.
-// Подаем единицу на вывод E.
-// Ожидание (по даташиту – не менее 150 нс)
-// Подаем на вывод E низкий уровень (0).
 //******************************************************************************
-// Подключение дисплея
-// DB0  = PE0 
-// DB1  = PE1
-// DB2  = PE2
-// DB3  = PE3
-// DB4  = PE4
-// DB5  = PE5
-// DB6  = PE6
-// DB7  = PE7
-/*******************************************************************************/
-// Распиновка дисплея
+// Display connection
+
 // GND  1
 // +5V  2
 // Vo   3													Contrast Adjust
@@ -43,18 +29,17 @@ class WH1602B
 		void InitLCD(uint8_t mode);
 		void ClearLCD();
 		void SetPosition(uint8_t row, uint8_t column);
-		void WriteString(const unsigned char *str); 					// вывод текста в положение курсора 
-		
+		void WriteString(const unsigned char *str); 
 	
 	private:
-		uint8_t Write(uint8_t data, uint8_t data_type);	// data - данные для записи, data_type - команда или информация на дисплей
+		uint8_t Write(uint8_t data, uint8_t data_type);					// data_type - command or in informatin to display
 		void SetPort(uint8_t);
 		void RS_PIN(uint8_t state);
 		void RW_PIN(uint8_t state);
 		void E_PIN(uint8_t state);
 		uint8_t WaitLCD();
 	
-		uint8_t display_mode;																				// 0 - четырехпроводный, 1 - восьмипроводный интерфейс	
+		uint8_t display_mode;																		// 0 - 4 wire, 1 - 8 wire	
 	  static uint8_t RUSSIAN[64];
 	
 		static const uint8_t CMD = 0x00;
