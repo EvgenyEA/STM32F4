@@ -79,6 +79,7 @@ WH1602B LCD;
 WH1602B::WH1602B()
 {
 	display_mode = 1;
+	time_to_wait = 40000;
 }
 
 // ---------------------------- Initialization ---------------------------------
@@ -180,6 +181,7 @@ void WH1602B::InitLCD(uint8_t mode)
 		Write(0x06, CMD);																// 0x06 = 00000110, Address increment, display isn't move
 		Write(0x0E, CMD);																// 0x0E = 00001110, Dispplay on, cursor on, cursor blinking off
 	}
+	time_to_wait = 100;
 }
 
 // ------------------------ Clear display ----------------------------------
@@ -267,7 +269,7 @@ uint8_t WH1602B::Write(uint8_t data, uint8_t data_type)
 	{
 		SetPort(data);
 		E_PIN(1);
-		Tim14DelayUs(45);
+		Tim14DelayUs(time_to_wait);
 		E_PIN(0);
 	}
 	else
@@ -277,12 +279,12 @@ uint8_t WH1602B::Write(uint8_t data, uint8_t data_type)
 		
 		SetPort(two_half);
 		E_PIN(1);
-		Tim14DelayUs(100);
+		Tim14DelayUs(time_to_wait);
 		E_PIN(0);
 		
 		SetPort(one_half);
 		E_PIN(1);
-		Tim14DelayUs(100);
+		Tim14DelayUs(time_to_wait);
 		E_PIN(0);
 	}
 	return 0;

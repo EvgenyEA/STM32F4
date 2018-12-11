@@ -28,19 +28,20 @@ class WH1602B
 		WH1602B();
 		void InitLCD(uint8_t mode);
 		void ClearLCD();
-		void SetPosition(uint8_t row, uint8_t column);
+		void SetPosition(uint8_t row, uint8_t column);						// row 0, 1; column 1, 16
 		void WriteString(const unsigned char *str); 
 	
 	private:
-		uint8_t Write(uint8_t data, uint8_t data_type);					// data_type - command or in informatin to display
+		uint8_t Write(uint8_t data, uint8_t data_type);						// data_type - command or in informatin to display
 		void SetPort(uint8_t);
 		void RS_PIN(uint8_t state);
 		void RW_PIN(uint8_t state);
 		void E_PIN(uint8_t state);
 		uint8_t WaitLCD();
 	
-		uint8_t display_mode;																		// 0 - 4 wire, 1 - 8 wire	
+		uint8_t display_mode;																			// 0 - 4 wire, 1 - 8 wire	
 	  static uint8_t RUSSIAN[64];
+		uint16_t time_to_wait;																		// time delay (depend from display state)
 	
 		static const uint8_t CMD = 0x00;
 		static const uint8_t DATA = 0x01;
